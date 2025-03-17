@@ -1,8 +1,8 @@
 from cloudflare import Cloudflare
 from fastapi import  FastAPI, HTTPException, status
 from sqlmodel import select
-from database import Database
-from models import PublicUserProfileResponse, UploadVideoResponse, Video, VideoLike, VideoResponse
+from .database import Database
+from .models import PublicUserProfileResponse, UploadVideoResponse, Video, VideoLike, VideoResponse
 
 app = FastAPI()
 
@@ -52,6 +52,7 @@ def get_upload_url(db: Database, duration: int = 300):
     if duration > 500:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Duration exceeds allowed") 
 
+    # https://developers.cloudflare.com/api/resources/stream/subresources/direct_upload/methods/create/
     du = client.stream.direct_upload.create(account_id="account_id", max_duration_seconds=duration)
     if du:
         video = Video(cloudflare_id=du.uid, duration=duration)
